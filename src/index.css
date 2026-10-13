@@ -1,0 +1,403 @@
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --borde: #dfe2e8;
+  --texto: #1d2330;
+  --suave: #667085;
+  --acento: #1f5fbf;
+  --acento-oscuro: #174a96;
+  --ok: #1b7f4b;
+  --ok-fondo: #e3f4ea;
+  --error: #b42318;
+  --error-fondo: #fdecea;
+  --aviso: #8a5a00;
+  --aviso-fondo: #fff4d6;
+  --radio: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171d;
+    --panel: #1d222b;
+    --borde: #313846;
+    --texto: #e8ebf1;
+    --suave: #9aa3b5;
+    --acento: #5b9bff;
+    --acento-oscuro: #82b3ff;
+    --ok: #5fd39a;
+    --ok-fondo: #173326;
+    --error: #ff8f84;
+    --error-fondo: #3a1c19;
+    --aviso: #f2c262;
+    --aviso-fondo: #38300f;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+a {
+  color: var(--acento);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ── Estructura ── */
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--borde);
+  flex-wrap: wrap;
+}
+.barra .marca {
+  font-weight: 700;
+}
+.barra nav {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.barra nav a {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  color: var(--texto);
+}
+.barra nav a.activo {
+  background: var(--bg);
+  font-weight: 600;
+  text-decoration: none;
+}
+.barra .usuario {
+  color: var(--suave);
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.tarjeta {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.fila {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.fila.entre {
+  justify-content: space-between;
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.suave {
+  color: var(--suave);
+}
+.chico {
+  font-size: 0.85rem;
+}
+.derecha {
+  text-align: right;
+}
+
+/* ── Formularios ── */
+label.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--suave);
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--texto);
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  width: 100%;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+}
+input[type="checkbox"] {
+  width: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid var(--acento);
+  background: var(--acento);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover {
+  background: var(--acento-oscuro);
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn.sec {
+  background: transparent;
+  color: var(--acento);
+}
+.btn.sec:hover {
+  background: var(--bg);
+}
+.btn.peligro {
+  background: transparent;
+  color: var(--error);
+  border-color: var(--error);
+}
+.btn.chico {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+
+/* ── Mensajes ── */
+.msg {
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  font-size: 0.92rem;
+}
+.msg.error {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+.msg.ok {
+  background: var(--ok-fondo);
+  color: var(--ok);
+}
+.msg.aviso {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+}
+.msg ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+}
+
+/* ── Tablas ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--borde);
+  vertical-align: middle;
+}
+th {
+  font-size: 0.8rem;
+  color: var(--suave);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+/* ── Estados ── */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--bg);
+  border: 1px solid var(--borde);
+}
+.badge.e-INGRESADO {
+  background: #e8eefc;
+  color: #2a4fa8;
+  border-color: #c5d3f5;
+}
+.badge.e-ESPERANDO_PAPELES_SEGURO,
+.badge.e-ESPERANDO_REPUESTOS {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  border-color: transparent;
+}
+.badge.e-EN_REPARACION {
+  background: #e6f3fb;
+  color: #12618f;
+  border-color: #bfe0f3;
+}
+.badge.e-CONTROL_CALIDAD {
+  background: #efe9fb;
+  color: #5b3aa6;
+  border-color: #d9cdf3;
+}
+.badge.e-LISTO_PARA_ENTREGA,
+.badge.e-ENTREGADO {
+  background: var(--ok-fondo);
+  color: var(--ok);
+  border-color: transparent;
+}
+.badge.pendiente {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  border-color: transparent;
+}
+.badge.cargado {
+  background: var(--ok-fondo);
+  color: var(--ok);
+  border-color: transparent;
+}
+
+/* ── Pasos del siniestro ── */
+.pasos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.25rem 0 1rem;
+}
+.paso {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  border: 1px solid var(--borde);
+  color: var(--suave);
+}
+.paso.hecho {
+  background: var(--ok-fondo);
+  color: var(--ok);
+  border-color: transparent;
+}
+.paso.actual {
+  background: var(--acento);
+  color: #fff;
+  border-color: var(--acento);
+  font-weight: 600;
+}
+
+/* ── Dashboard ── */
+.numero-grande {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.mini {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+}
+a.mini:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.mini b {
+  font-size: 1.25rem;
+  display: block;
+}
+
+.linea-tiempo {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.linea-tiempo li {
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 2px solid var(--borde);
+  margin-left: 0.4rem;
+}
+
+.clave-temporal {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.login {
+  max-width: 380px;
+  margin: 12vh auto 0;
+}
+
+/* ── Login con logo ── */
+.login .tarjeta {
+  padding: 0;
+  overflow: hidden;
+}
+.login-marca {
+  background: #14213d; /* el logo es blanco: necesita fondo oscuro en modo claro y oscuro */
+  padding: 1.75rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+.login-marca img {
+  display: block;
+  height: 110px;
+  width: auto;
+}
+.login-cuerpo {
+  padding: 1.1rem 1.25rem 1.35rem;
+}
+.login-cuerpo h1 {
+  text-align: center;
+  font-size: 1.2rem;
+}

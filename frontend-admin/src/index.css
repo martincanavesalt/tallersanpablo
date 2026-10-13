@@ -1,0 +1,743 @@
+:root {
+  --marca: #0c4a83;
+  --marca-oscura: #083560;
+  --marca-fondo: #e4edf7;
+  --bg: #eef2f6;
+  --panel: #ffffff;
+  --borde: #d9e0e9;
+  --texto: #14202e;
+  --suave: #5b6b7e;
+  --acento: #0c4a83;
+  --acento-oscuro: #083560;
+  --ok: #1b7f4b;
+  --ok-fondo: #e3f4ea;
+  --error: #b42318;
+  --error-fondo: #fdecea;
+  --aviso: #8a5a00;
+  --aviso-fondo: #fff4d6;
+  --radio: 8px;
+  --sombra: 0 1px 2px rgba(12, 40, 70, 0.06);
+  --fuente: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --fuente-titulo: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --marca-fondo: #12304f;
+    --bg: #0d141c;
+    --panel: #151f2b;
+    --borde: #28364a;
+    --texto: #e6ebf2;
+    --suave: #98a6b9;
+    --acento: #5aa0ea;
+    --acento-oscuro: #86bcf2;
+    --ok: #5fd39a;
+    --ok-fondo: #173326;
+    --error: #ff8f84;
+    --error-fondo: #3a1c19;
+    --aviso: #f2c262;
+    --aviso-fondo: #38300f;
+    --sombra: none;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--acento);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2 {
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+h1 {
+  font-size: 1.85rem;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+}
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ── Estructura: barra lateral con la marca ── */
+.app {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+}
+.lateral {
+  background: var(--marca);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.lateral-marca {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 1.1rem 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.lateral-marca img {
+  width: 52px;
+  height: auto;
+  flex: none;
+}
+.lateral-marca b {
+  display: block;
+  font-family: var(--fuente-titulo);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.lateral-marca span {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+.lateral-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.9rem 0.65rem;
+  flex: 1;
+}
+.lateral-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+.lateral-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  text-decoration: none;
+}
+.lateral-nav a.activo {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-left-color: #fff;
+  font-weight: 600;
+}
+.lateral-nav .icono {
+  flex: none;
+}
+.lateral-usuario {
+  padding: 0.9rem 1.1rem 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.9rem;
+}
+.lateral-usuario .quien b {
+  display: block;
+  font-weight: 600;
+}
+.lateral-usuario .quien span {
+  opacity: 0.75;
+  font-size: 0.84rem;
+}
+.lateral-usuario .acciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+.lateral-usuario .acciones a,
+.lateral-usuario .acciones button {
+  font: inherit;
+  font-size: 0.85rem;
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+}
+.lateral-usuario .acciones a:hover,
+.lateral-usuario .acciones button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+.lateral a:focus-visible,
+.lateral button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+main {
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.75rem 1.75rem 3.5rem;
+}
+
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .lateral {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .lateral-marca {
+    border-bottom: none;
+    padding: 0.7rem 1rem;
+    flex: 1;
+  }
+  .lateral-marca img {
+    width: 38px;
+  }
+  .lateral-marca span {
+    display: none;
+  }
+  .lateral-usuario {
+    border-top: none;
+    padding: 0.5rem 1rem;
+  }
+  .lateral-usuario .quien {
+    display: none;
+  }
+  .lateral-usuario .acciones {
+    margin-top: 0;
+  }
+  .lateral-nav {
+    order: 3;
+    flex: 1 0 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0.35rem 0.6rem 0.6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .lateral-nav a {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .lateral-nav a.activo {
+    border-bottom-color: #fff;
+  }
+  main {
+    padding: 1.1rem 1rem 3rem;
+  }
+}
+
+.tarjeta {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.fila {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.fila.entre {
+  justify-content: space-between;
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.suave {
+  color: var(--suave);
+}
+.chico {
+  font-size: 0.85rem;
+}
+.derecha {
+  text-align: right;
+}
+
+/* ── Formularios ── */
+label.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--suave);
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--texto);
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  width: 100%;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--acento);
+  outline-offset: 1px;
+  border-color: var(--acento);
+}
+.btn:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+input[type="checkbox"] {
+  width: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid var(--acento);
+  background: var(--acento);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover {
+  background: var(--acento-oscuro);
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn.sec {
+  background: transparent;
+  color: var(--acento);
+}
+.btn.sec:hover {
+  background: var(--marca-fondo);
+}
+.btn.peligro {
+  background: transparent;
+  color: var(--error);
+  border-color: var(--error);
+}
+.btn.chico {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+.btn.grande {
+  justify-content: center;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+}
+
+/* ── Mensajes ── */
+.msg {
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  font-size: 0.92rem;
+}
+.msg.error {
+  background: var(--error-fondo);
+  color: var(--error);
+}
+.msg.ok {
+  background: var(--ok-fondo);
+  color: var(--ok);
+}
+.msg.aviso {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+}
+.msg ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+}
+
+/* ── Tablas ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--borde);
+  vertical-align: middle;
+}
+th {
+  font-size: 0.86rem;
+  color: var(--suave);
+  font-weight: 600;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+/* ── Estados ── */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--bg);
+  border: 1px solid var(--borde);
+}
+.badge.e-INGRESADO {
+  background: #e8eefc;
+  color: #2a4fa8;
+  border-color: #c5d3f5;
+}
+.badge.e-ESPERANDO_PAPELES_SEGURO,
+.badge.e-ESPERANDO_REPUESTOS {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  border-color: transparent;
+}
+.badge.e-EN_REPARACION {
+  background: #e6f3fb;
+  color: #12618f;
+  border-color: #bfe0f3;
+}
+.badge.e-CONTROL_CALIDAD {
+  background: #efe9fb;
+  color: #5b3aa6;
+  border-color: #d9cdf3;
+}
+.badge.e-LISTO_PARA_ENTREGA,
+.badge.e-ENTREGADO {
+  background: var(--ok-fondo);
+  color: var(--ok);
+  border-color: transparent;
+}
+.badge.pendiente {
+  background: var(--aviso-fondo);
+  color: var(--aviso);
+  border-color: transparent;
+}
+.badge.cargado {
+  background: var(--ok-fondo);
+  color: var(--ok);
+  border-color: transparent;
+}
+
+/* ── Recorrido del siniestro (es una secuencia real: va numerado) ── */
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 7), minmax(92px, 1fr));
+  gap: 0;
+  margin: 0.25rem 0 1.25rem;
+  padding-bottom: 0.4rem;
+  counter-reset: paso;
+  overflow-x: auto;
+}
+.paso {
+  counter-increment: paso;
+  position: relative;
+  padding: 2.1rem 0.35rem 0;
+  text-align: center;
+  font-size: 0.82rem;
+  line-height: 1.25;
+  color: var(--suave);
+}
+.paso::before {
+  content: counter(paso);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--fuente-titulo);
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: var(--panel);
+  border: 2px solid var(--borde);
+  z-index: 1;
+}
+.paso::after {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  left: calc(-50% + 0.83rem);
+  right: calc(50% + 0.83rem);
+  height: 2px;
+  background: var(--borde);
+}
+.paso:first-child::after {
+  display: none;
+}
+.paso.hecho {
+  color: var(--texto);
+}
+.paso.hecho::before {
+  content: "✓";
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+.paso.hecho::after,
+.paso.actual::after {
+  background: var(--ok);
+}
+.paso.actual {
+  color: var(--acento);
+  font-weight: 600;
+}
+.paso.actual::before {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--panel);
+  box-shadow: 0 0 0 4px var(--marca-fondo);
+}
+
+/* ── Dashboard ── */
+.numero-grande {
+  font-family: var(--fuente-titulo);
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--acento);
+}
+.mini {
+  display: block;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  color: var(--texto);
+}
+a.mini:hover {
+  background: var(--bg);
+  text-decoration: none;
+}
+.mini b {
+  font-family: var(--fuente-titulo);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  display: block;
+}
+.mini:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.linea-tiempo {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.linea-tiempo li {
+  padding: 0.5rem 0 0.5rem 1rem;
+  border-left: 2px solid var(--borde);
+  margin-left: 0.4rem;
+}
+
+.clave-temporal {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+/* ── Login: panel de marca + formulario ── */
+.login {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 5fr) 6fr;
+}
+.login-marca {
+  background: var(--marca);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem clamp(1.5rem, 6vw, 4.5rem);
+  gap: 0.25rem;
+}
+.login-marca img {
+  width: clamp(120px, 16vw, 190px);
+  height: auto;
+  margin-bottom: 1.25rem;
+}
+.login-marca h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin: 0;
+}
+.login-marca p {
+  margin: 0.4rem 0 0;
+  max-width: 28ch;
+  opacity: 0.8;
+  font-size: 1.05rem;
+}
+.login-cuerpo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+.login-cuerpo form {
+  width: 100%;
+  max-width: 340px;
+  display: grid;
+  gap: 1rem;
+}
+.login-cuerpo h2 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .login {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .login-marca {
+    padding: 1.75rem 1.5rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+  }
+  .login-marca img {
+    width: 64px;
+    margin: 0;
+  }
+  .login-marca h1 {
+    font-size: 1.7rem;
+  }
+  .login-marca p {
+    flex: 1 0 100%;
+    max-width: none;
+    font-size: 0.95rem;
+  }
+}
+
+/* ── Elección del tipo de ingreso ── */
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.9rem;
+}
+.opcion {
+  font: inherit;
+  color: var(--texto);
+  text-align: left;
+  background: var(--panel);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.1rem 1.2rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.opcion b {
+  font-family: var(--fuente-titulo);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--acento);
+}
+.opcion span {
+  color: var(--suave);
+}
+.opcion:hover,
+.opcion:focus-visible {
+  border-color: var(--acento);
+  background: var(--marca-fondo);
+  outline: none;
+}
+
+/* ── Tablero de gestión por etapas ── */
+.tablero {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  align-items: flex-start;
+  padding-bottom: 0.75rem;
+}
+.columna {
+  flex: 0 0 268px;
+  background: var(--marca-fondo);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.65rem;
+}
+.columna.meta {
+  border-color: var(--ok);
+  border-width: 2px;
+}
+.columna h3 {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-family: var(--fuente-titulo);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.columna h3 .cuenta {
+  flex: none;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  font-size: 0.85rem;
+}
+.ficha-mini {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+}
+.ficha-mini select {
+  margin-top: 0.45rem;
+  padding: 0.3rem 0.45rem;
+  font-size: 0.85rem;
+}

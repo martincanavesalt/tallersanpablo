@@ -1,0 +1,353 @@
+// Schema del sistema de gestión — Taller de chapería (NORTE / OESTE / SUR)
+// ORM: Prisma | Base de datos: PostgreSQL
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum RolUsuario {
+  ADMIN
+  ADMINISTRATIVO
+  TALLERISTA
+  ENCARGADO
+  // Rol anterior a la separación por puestos. Se conserva para no romper usuarios
+  // ya creados; la API no permite asignarlo y se comporta como ENCARGADO.
+  EMPLEADO
+}
+
+// Cómo llega el cliente: paga él (PARTICULAR) o hay una aseguradora de por medio
+enum TipoTrabajo {
+  PARTICULAR
+  ASEGURADORA
+}
+
+enum NombreSucursal {
+  NORTE
+  OESTE
+  SUR
+}
+
+enum TipoCobertura {
+  TERCERO
+  TODO_RIESGO
+  TODO_RIESGO_FRANQUICIA
+}
+
+enum EstadoSiniestro {
+  INGRESADO
+  ESPERANDO_PAPELES_SEGURO
+  EN_REPARACION
+  ESPERANDO_REPUESTOS
+  CONTROL_CALIDAD
+  LISTO_PARA_ENTREGA
+  ENTREGADO
+}
+
+enum TipoDocumento {
+  CARNET_CONDUCIR_FRENTE
+  CARNET_CONDUCIR_DORSO
+  POLIZA_SEGURO
+  CARTA_FRANQUICIA
+  TARJETA_AZUL_FRENTE
+  TARJETA_AZUL_DORSO
+  DNI_FRENTE
+  DNI_DORSO
+  OTRO
+}
+
+enum FormatoArchivo {
+  JPG
+  PDF
+}
+
+enum TipoMovimientoCC {
+  DEBITO
+  CREDITO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TRANSFERENCIA
+  TARJETA_DEBITO
+  TARJETA_CREDITO
+  CHEQUE
+}
+
+// ─────────────────────────────────────────────
+// MODELOS
+// ─────────────────────────────────────────────
+
+model Sucursal {
+  id        Int             @id @default(autoincrement())
+  nombre    NombreSucursal  @unique
+  direccion String?
+  telefono  String?
+  createdAt DateTime        @default(now())
+
+  usuarios   Usuario[]
+  siniestros Siniestro[]
+
+  @@map("sucursales")
+}
+
+model Usuario {
+  id           Int         @id @default(autoincrement())
+  nombre       String
+  email        String      @unique
+  passwordHash String      @map("password_hash")
+  rol          RolUsuario
+  activo       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+
+  sucursalId Int      @map("sucursal_id")
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  siniestrosCargados     Siniestro[]        @relation("siniestro_usuario_carga")
+  documentosSubidos      Documento[]
+  movimientosHistorial   HistorialEstado[]
+  movimientosGestion     MovimientoGestion[]
+
+  @@index([sucursalId])
+  @@map("usuarios")
+}
+
+model Cliente {
+  id           Int      @id @default(autoincrement())
+  dni          String   @unique
+  nombre       String
+  apellido     String
+  telefono     String?
+  email        String?  @unique
+  direccion    String?
+  passwordHash String?  @map("password_hash") // login al portal, se setea en el alta o primer acceso
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  autos           Auto[]
+  cuentaCorriente MovimientoCC[]
+  cobros          Cobro[]
+
+  @@index([dni])
+  @@map("clientes")
+}
+
+model Auto {
+  id       Int     @id @default(autoincrement())
+  patente  String  @unique
+  marca    String
+  modelo   String
+  anio     Int?
+  color    String?
+  chasis   String? // VIN
+
+  clienteId Int     @map("cliente_id")
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  siniestros Siniestro[]
+
+  @@index([patente])
+  @@index([clienteId])
+  @@map("autos")
+}
+
+model Siniestro {
+  id               Int             @id @default(autoincrement())
+  numeroSiniestro  String          @unique @map("numero_siniestro")
+  tipoTrabajo      TipoTrabajo     @default(ASEGURADORA) @map("tipo_trabajo")
+  tipoCobertura    TipoCobertura?  @map("tipo_cobertura") // null en trabajos particulares
+  montoFranquicia  Decimal?        @map("monto_franquicia") @db.Decimal(12, 2) // solo si TODO_RIESGO_FRANQUICIA
+  estado           EstadoSiniestro @default(INGRESADO)
+  descripcion      String?
+  fechaIngreso     DateTime        @default(now()) @map("fecha_ingreso")
+  fechaEstimada    DateTime?       @map("fecha_estimada_entrega")
+  fechaEntrega     DateTime?       @map("fecha_entrega")
+
+  // Datos del seguro (solo trabajos por aseguradora)
+  // Gestión con la aseguradora (solo trabajos por aseguradora): etapa actual, configurable en la tabla etapas_gestion
+  etapaGestionId     Int?    @map("etapa_gestion_id")
+  etapaGestion       EtapaGestion? @relation(fields: [etapaGestionId], references: [id])
+  franquiciaResuelta Boolean @default(false) @map("franquicia_resuelta") // autorizada por la otra compañía o abonada por el cliente
+
+  aseguradora       String? // compañía del cliente
+  numeroPoliza      String? @map("numero_poliza")
+  aseguradoraTercero String? @map("aseguradora_tercero") // cobertura TERCERO: compañía del responsable
+  reclamoTercero    String? @map("reclamo_tercero") // nº de reclamo ante la compañía del tercero
+
+  // El hecho
+  fechaHecho DateTime? @map("fecha_hecho")
+  relato     String?
+
+  // Recepción del vehículo
+  kilometraje Int?
+  combustible String? // VACIO, UN_CUARTO, MEDIO, TRES_CUARTOS, LLENO
+  inventario  String? // pertenencias que quedan en el auto
+  estadoPrevio String? @map("estado_previo") // rayones o golpes ajenos al siniestro
+
+  autoId Int  @map("auto_id")
+  auto   Auto @relation(fields: [autoId], references: [id])
+
+  sucursalId Int      @map("sucursal_id")
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  usuarioCargaId Int     @map("usuario_carga_id")
+  usuarioCarga   Usuario @relation("siniestro_usuario_carga", fields: [usuarioCargaId], references: [id])
+
+  documentos        Documento[]
+  historialEstados  HistorialEstado[]
+  movimientosGestion MovimientoGestion[]
+  movimientosCC     MovimientoCC[]
+  cobros            Cobro[]
+
+  @@index([sucursalId])
+  @@index([etapaGestionId])
+  @@index([estado])
+  @@index([autoId])
+  @@map("siniestros")
+}
+
+// Checklist de documentos obligatorios por siniestro.
+// Se generan filas automáticamente al crear el siniestro (según tipoCobertura)
+// con archivoUrl = null hasta que se suban.
+// Los tipos obligatorios tienen UNA fila por siniestro (lo garantiza la API);
+// el tipo OTRO puede repetirse (fotos extra, presupuestos, etc).
+// archivoUrl guarda la clave del archivo en el storage, no una URL pública.
+model Documento {
+  id            Int             @id @default(autoincrement())
+  tipoDocumento TipoDocumento   @map("tipo_documento")
+  obligatorio   Boolean         @default(true)
+  formato       FormatoArchivo?
+  archivoUrl    String?         @map("archivo_url") // null = pendiente de carga
+  fechaCarga    DateTime?       @map("fecha_carga")
+
+  siniestroId Int       @map("siniestro_id")
+  siniestro   Siniestro @relation(fields: [siniestroId], references: [id])
+
+  usuarioId Int?     @map("usuario_id") // quién lo subió (null si aún no se cargó)
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@index([siniestroId, tipoDocumento])
+  @@map("documentos")
+}
+
+// Traza cada cambio de estado del siniestro — alimenta el timeline del portal cliente
+model HistorialEstado {
+  id             Int             @id @default(autoincrement())
+  estadoAnterior EstadoSiniestro? @map("estado_anterior")
+  estadoNuevo    EstadoSiniestro  @map("estado_nuevo")
+  fecha          DateTime         @default(now())
+  comentario     String?
+
+  siniestroId Int       @map("siniestro_id")
+  siniestro   Siniestro @relation(fields: [siniestroId], references: [id])
+
+  usuarioId Int     @map("usuario_id")
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@index([siniestroId])
+  @@map("historial_estados")
+}
+
+// Cuenta corriente: movimientos de deuda/crédito del cliente (no siempre atados a un cobro real)
+model MovimientoCC {
+  id             Int              @id @default(autoincrement())
+  tipoMovimiento TipoMovimientoCC @map("tipo_movimiento")
+  monto          Decimal          @db.Decimal(12, 2)
+  concepto       String
+  fecha          DateTime         @default(now())
+
+  clienteId Int     @map("cliente_id")
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  siniestroId Int?       @map("siniestro_id")
+  siniestro   Siniestro? @relation(fields: [siniestroId], references: [id])
+
+  @@index([clienteId])
+  @@map("cuenta_corriente")
+}
+
+// Cobros efectivos (pagos recibidos)
+model Cobro {
+  id         Int        @id @default(autoincrement())
+  monto      Decimal    @db.Decimal(12, 2)
+  metodoPago MetodoPago @map("metodo_pago")
+  fecha      DateTime   @default(now())
+  comprobanteUrl String? @map("comprobante_url")
+
+  clienteId Int     @map("cliente_id")
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  siniestroId Int?       @map("siniestro_id")
+  siniestro   Siniestro? @relation(fields: [siniestroId], references: [id])
+
+  @@index([clienteId])
+  @@map("cobros")
+}
+
+// ─────────────────────────────────────────────
+// GESTIÓN CON LA ASEGURADORA (etapas configurables)
+// ─────────────────────────────────────────────
+
+// Etapas por las que pasa un siniestro antes de tener turno. Se editan desde la base / el módulo
+// Configuración sin tocar el código. La que tiene esMeta = true es "Espera de turno": al llegar
+// ahí el auto puede pasar a reparación.
+model EtapaGestion {
+  id     Int     @id @default(autoincrement())
+  codigo String  @unique
+  nombre String
+  orden  Int
+  activa Boolean @default(true)
+  esMeta Boolean @default(false) @map("es_meta")
+
+  siniestros    Siniestro[]
+  salidas       EtapaTransicion[]   @relation("transicion_desde")
+  entradas      EtapaTransicion[]   @relation("transicion_hasta")
+  comoAnterior  MovimientoGestion[] @relation("movimiento_anterior")
+  comoNueva     MovimientoGestion[] @relation("movimiento_nueva")
+
+  @@map("etapas_gestion")
+}
+
+// Qué pasos están permitidos. coberturas: lista separada por comas; vacío = todas.
+model EtapaTransicion {
+  id                 Int     @id @default(autoincrement())
+  coberturas         String?
+  requiereDocumentos Boolean @default(false) @map("requiere_documentos")
+
+  desdeId Int          @map("desde_id")
+  desde   EtapaGestion @relation("transicion_desde", fields: [desdeId], references: [id])
+  hastaId Int          @map("hasta_id")
+  hasta   EtapaGestion @relation("transicion_hasta", fields: [hastaId], references: [id])
+
+  @@unique([desdeId, hastaId])
+  @@map("etapas_transiciones")
+}
+
+// Bitácora de la gestión: cada cambio de etapa queda registrado
+model MovimientoGestion {
+  id         Int      @id @default(autoincrement())
+  fecha      DateTime @default(now())
+  comentario String?
+
+  siniestroId Int       @map("siniestro_id")
+  siniestro   Siniestro @relation(fields: [siniestroId], references: [id])
+
+  etapaAnteriorId Int?          @map("etapa_anterior_id")
+  etapaAnterior   EtapaGestion? @relation("movimiento_anterior", fields: [etapaAnteriorId], references: [id])
+  etapaNuevaId    Int           @map("etapa_nueva_id")
+  etapaNueva      EtapaGestion  @relation("movimiento_nueva", fields: [etapaNuevaId], references: [id])
+
+  usuarioId Int     @map("usuario_id")
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@index([siniestroId])
+  @@map("movimientos_gestion")
+}
